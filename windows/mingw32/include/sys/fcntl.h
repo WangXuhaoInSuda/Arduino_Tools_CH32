@@ -1,13 +1,12 @@
-/**
- * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the mingw-w64 runtime package.
- * No warranty is given; refer to the file DISCLAIMER.PD within this package.
- */
-/*
- * This file is part of the Mingw32 package.
- *
- * This fcntl.h maps to the root fcntl.h
- */
+#ifndef _SYS_FCNTL_H_
+#define _SYS_FCNTL_H_
 
-#include <fcntl.h>
+#include <sys/_default_fcntl.h>
 
+/* We want to support O_BINARY for the open syscall.
+   For example, the Demon debug monitor has a separate
+   flag value for "rb" vs "r". */
+#define _FBINARY        0x10000
+#define O_BINARY        _FBINARY
+
+#endif /* _SYS_FCNTL_H_ */

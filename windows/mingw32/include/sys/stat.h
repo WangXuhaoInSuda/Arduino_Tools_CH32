@@ -1,291 +1,189 @@
-/**
- * This file has no copyright assigned and is placed in the Public Domain.
- * This file is part of the mingw-w64 runtime package.
- * No warranty is given; refer to the file DISCLAIMER.PD within this package.
- */
-#ifndef _INC_STAT
-#define _INC_STAT
-
-#ifndef _WIN32
-#error Only Win32 target is supported!
-#endif
-
-#include <crtdefs.h>
-#include <io.h>
-
-#pragma pack(push,_CRT_PACKING)
+#ifndef	_SYS_STAT_H
+#define	_SYS_STAT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef _CRTIMP
-#define _CRTIMP __declspec(dllimport)
-#endif
-
+#include <_ansi.h>
+#include <time.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
+#include <sys/_timespec.h>
 
-#ifdef _USE_32BIT_TIME_T
-#ifdef _WIN64
-#undef _USE_32BIT_TIME_T
-#endif
-#endif
+/* dj's stat defines _STAT_H_ */
+#ifndef _STAT_H_
 
-#ifndef _TIME32_T_DEFINED
-  typedef long __time32_t;
-#define _TIME32_T_DEFINED
-#endif
+/* It is intended that the layout of this structure not change when the
+   sizes of any of the basic types change (short, int, long) [via a compile
+   time option].  */
 
-#ifndef _TIME64_T_DEFINED
-  __MINGW_EXTENSION typedef __int64 __time64_t;
-#define _TIME64_T_DEFINED
-#endif
-
-#ifndef _TIME_T_DEFINED
-#ifdef _USE_32BIT_TIME_T
-  typedef __time32_t time_t;
-#else
-  typedef __time64_t time_t;
-#endif
-#define _TIME_T_DEFINED
-#endif
-
-#ifndef _WCHAR_T_DEFINED
-  typedef unsigned short wchar_t;
-#define _WCHAR_T_DEFINED
-#endif
-
-#include <_mingw_stat64.h>
-
-#define _S_IFMT 0xF000
-#define _S_IFDIR 0x4000
-#define _S_IFCHR 0x2000
-#define _S_IFIFO 0x1000
-#define _S_IFREG 0x8000
-#define _S_IREAD 0x0100
-#define _S_IWRITE 0x0080
-#define _S_IEXEC 0x0040
-
-  _CRTIMP int __cdecl _fstat32(int _FileDes,struct _stat32 *_Stat);
-  _CRTIMP int __cdecl _stat32(const char *_Name,struct _stat32 *_Stat);
-  _CRTIMP int __cdecl _fstat64(int _FileDes,struct _stat64 *_Stat);
-  _CRTIMP int __cdecl _fstat32i64(int _FileDes,struct _stat32i64 *_Stat);
-  int __cdecl _fstat64i32(int _FileDes,struct _stat64i32 *_Stat);
-#ifndef __CRT__NO_INLINE
-  __CRT_INLINE int __cdecl _fstat64i32(int _FileDes,struct _stat64i32 *_Stat)
-  {
-    struct _stat64 st;
-    int __ret=_fstat64(_FileDes,&st);
-    if (__ret == -1) {
-      memset(_Stat,0,sizeof(struct _stat64i32));
-      return -1;
-    }
-    _Stat->st_dev=st.st_dev;
-    _Stat->st_ino=st.st_ino;
-    _Stat->st_mode=st.st_mode;
-    _Stat->st_nlink=st.st_nlink;
-    _Stat->st_uid=st.st_uid;
-    _Stat->st_gid=st.st_gid;
-    _Stat->st_rdev=st.st_rdev;
-    _Stat->st_size=(_off_t) st.st_size;
-    _Stat->st_atime=st.st_atime;
-    _Stat->st_mtime=st.st_mtime;
-    _Stat->st_ctime=st.st_ctime;
-    return __ret;
-  }
-#endif /* __CRT__NO_INLINE */
-  _CRTIMP int __cdecl _stat64(const char *_Name,struct _stat64 *_Stat);
-  _CRTIMP int __cdecl _stat32i64(const char *_Name,struct _stat32i64 *_Stat);
-  int __cdecl _stat64i32(const char *_Name,struct _stat64i32 *_Stat);
-#ifndef __CRT__NO_INLINE
-  __CRT_INLINE int __cdecl _stat64i32(const char *_Name,struct _stat64i32 *_Stat)
-  {
-    struct _stat64 st;
-    int __ret=_stat64(_Name,&st);
-    if (__ret == -1) {
-      memset(_Stat,0,sizeof(struct _stat64i32));
-      return -1;
-    }
-    _Stat->st_dev=st.st_dev;
-    _Stat->st_ino=st.st_ino;
-    _Stat->st_mode=st.st_mode;
-    _Stat->st_nlink=st.st_nlink;
-    _Stat->st_uid=st.st_uid;
-    _Stat->st_gid=st.st_gid;
-    _Stat->st_rdev=st.st_rdev;
-    _Stat->st_size=(_off_t) st.st_size;
-    _Stat->st_atime=st.st_atime;
-    _Stat->st_mtime=st.st_mtime;
-    _Stat->st_ctime=st.st_ctime;
-    return __ret;
-  }
-#endif /* __CRT__NO_INLINE */
-
-#ifndef _WSTAT_DEFINED
-#define _WSTAT_DEFINED
-  _CRTIMP int __cdecl _wstat32(const wchar_t *_Name,struct _stat32 *_Stat);
-  _CRTIMP int __cdecl _wstat32i64(const wchar_t *_Name,struct _stat32i64 *_Stat);
-  int __cdecl _wstat64i32(const wchar_t *_Name,struct _stat64i32 *_Stat);
-  _CRTIMP int __cdecl _wstat64(const wchar_t *_Name,struct _stat64 *_Stat);
-#endif
-
-#ifndef	NO_OLDNAMES
-#define	_S_IFBLK	0x3000	/* Block: Is this ever set under w32? */
-
-#define S_IFMT _S_IFMT
-#define S_IFDIR _S_IFDIR
-#define S_IFCHR _S_IFCHR
-#define S_IFREG _S_IFREG
-#define S_IREAD _S_IREAD
-#define S_IWRITE _S_IWRITE
-#define S_IEXEC _S_IEXEC
-#define	S_IFIFO		_S_IFIFO
-#define	S_IFBLK		_S_IFBLK
-
-#define	_S_IRWXU	(_S_IREAD | _S_IWRITE | _S_IEXEC)
-#define	_S_IXUSR	_S_IEXEC
-#define	_S_IWUSR	_S_IWRITE
-
-#define	S_IRWXU		_S_IRWXU
-#define	S_IXUSR		_S_IXUSR
-#define	S_IWUSR		_S_IWUSR
-#define	S_IRUSR		_S_IRUSR
-#define	_S_IRUSR	_S_IREAD
-
-#define S_IRGRP    (S_IRUSR >> 3)
-#define S_IWGRP    (S_IWUSR >> 3)
-#define S_IXGRP    (S_IXUSR >> 3)
-#define S_IRWXG    (S_IRWXU >> 3)
-
-#define S_IROTH    (S_IRGRP >> 3)
-#define S_IWOTH    (S_IWGRP >> 3)
-#define S_IXOTH    (S_IXGRP >> 3)
-#define S_IRWXO    (S_IRWXG >> 3)
-
-#define	S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)
-#define	S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)
-#define	S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
-#define	S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
-#define	S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
-
-#endif
-
-#if !defined (RC_INVOKED) && !defined (NO_OLDNAMES)
-int __cdecl fstat(int _Desc,struct stat *_Stat);
-#ifdef _UCRT
-  __mingw_ovr int __cdecl stat(const char *_Filename,struct stat *_Stat)
-  {
-    return _stat(_Filename, (struct _stat *)_Stat);
-  }
-  __mingw_ovr int __cdecl wstat(const wchar_t *_Filename,struct stat *_Stat)
-  {
-    return _wstat(_Filename, (struct _stat *)_Stat);
-  }
-#else
-int __cdecl stat(const char *_Filename,struct stat *_Stat);
-int __cdecl wstat(const wchar_t *_Filename,struct stat *_Stat);
-#endif
-
-#ifndef __CRT__NO_INLINE
-#ifdef _USE_32BIT_TIME_T
-__CRT_INLINE int __cdecl
- fstat(int _Desc,struct stat *_Stat) {
-  struct _stat32 st;
-  int __ret=_fstat32(_Desc,&st);
-  if (__ret == -1) {
-    memset(_Stat,0,sizeof(struct stat));
-    return -1;
-  }
-  /* struct stat and struct _stat32
-     are the same for this case. */
-  memcpy(_Stat, &st, sizeof(struct _stat32));
-  return __ret;
-}
-/* Disable it for making sure trailing slash issue is fixed.  */
-#if 0
-__CRT_INLINE int __cdecl
- stat(const char *_Filename,struct stat *_Stat) {
-  struct _stat32 st;
-  int __ret=_stat32(_Filename,&st);
-  if (__ret == -1) {
-    memset(_Stat,0,sizeof(struct stat));
-    return -1;
-  }
-  /* struct stat and struct _stat32
-     are the same for this case. */
-  memcpy(_Stat, &st, sizeof(struct _stat32));
-  return __ret;
-}
+#ifdef __CYGWIN__
+#include <cygwin/stat.h>
+#ifdef _COMPILING_NEWLIB
+#define stat64 stat
 #endif
 #else
-__CRT_INLINE int __cdecl
- fstat(int _Desc,struct stat *_Stat) {
-  struct _stat64 st;
-  int __ret=_fstat64(_Desc,&st);
-  if (__ret == -1) {
-    memset(_Stat,0,sizeof(struct stat));
-    return -1;
-  }
-  /* struct stat and struct _stat64i32
-     are the same for this case. */
-  _Stat->st_dev=st.st_dev;
-  _Stat->st_ino=st.st_ino;
-  _Stat->st_mode=st.st_mode;
-  _Stat->st_nlink=st.st_nlink;
-  _Stat->st_uid=st.st_uid;
-  _Stat->st_gid=st.st_gid;
-  _Stat->st_rdev=st.st_rdev;
-  _Stat->st_size=(_off_t) st.st_size;
-  _Stat->st_atime=st.st_atime;
-  _Stat->st_mtime=st.st_mtime;
-  _Stat->st_ctime=st.st_ctime;
-  return __ret;
-}
-/* Disable it for making sure trailing slash issue is fixed.  */
-#if 0
-__CRT_INLINE int __cdecl
- stat(const char *_Filename,struct stat *_Stat) {
-  struct _stat64 st;
-  int __ret=_stat64(_Filename,&st);
-  if (__ret == -1) {
-    memset(_Stat,0,sizeof(struct stat));
-    return -1;
-  }
-  /* struct stat and struct _stat64i32
-     are the same for this case. */
-  _Stat->st_dev=st.st_dev;
-  _Stat->st_ino=st.st_ino;
-  _Stat->st_mode=st.st_mode;
-  _Stat->st_nlink=st.st_nlink;
-  _Stat->st_uid=st.st_uid;
-  _Stat->st_gid=st.st_gid;
-  _Stat->st_rdev=st.st_rdev;
-  _Stat->st_size=(_off_t) st.st_size;
-  _Stat->st_atime=st.st_atime;
-  _Stat->st_mtime=st.st_mtime;
-  _Stat->st_ctime=st.st_ctime;
-  return __ret;
-}
-#endif
-#endif /* _USE_32BIT_TIME_T */
-#endif /* __CRT__NO_INLINE */
-#endif /* !RC_INVOKED && !NO_OLDNAMES */
-
-#if defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64)
-#ifdef _USE_32BIT_TIME_T
-#define stat _stat32i64
-#define fstat _fstat32i64
+struct	stat 
+{
+  dev_t		st_dev;
+  ino_t		st_ino;
+  mode_t	st_mode;
+  nlink_t	st_nlink;
+  uid_t		st_uid;
+  gid_t		st_gid;
+  dev_t		st_rdev;
+  off_t		st_size;
+#if defined(__rtems__)
+  struct timespec st_atim;
+  struct timespec st_mtim;
+  struct timespec st_ctim;
+  blksize_t     st_blksize;
+  blkcnt_t	st_blocks;
 #else
-#define stat _stat64
-#define fstat _fstat64
+  /* SysV/sco doesn't have the rest... But Solaris, eabi does.  */
+#if defined(__svr4__) && !defined(__PPC__) && !defined(__sun__)
+  time_t	st_atime;
+  time_t	st_mtime;
+  time_t	st_ctime;
+#else
+  time_t	st_atime;
+  long		st_spare1;
+  time_t	st_mtime;
+  long		st_spare2;
+  time_t	st_ctime;
+  long		st_spare3;
+  blksize_t	st_blksize;
+  blkcnt_t	st_blocks;
+  long	st_spare4[2];
+#endif
+#endif
+};
+
+#if defined(__rtems__)
+#define st_atime st_atim.tv_sec
+#define st_ctime st_ctim.tv_sec
+#define st_mtime st_mtim.tv_sec
+#endif
+
+#endif
+
+#define	_IFMT		0170000	/* type of file */
+#define		_IFDIR	0040000	/* directory */
+#define		_IFCHR	0020000	/* character special */
+#define		_IFBLK	0060000	/* block special */
+#define		_IFREG	0100000	/* regular */
+#define		_IFLNK	0120000	/* symbolic link */
+#define		_IFSOCK	0140000	/* socket */
+#define		_IFIFO	0010000	/* fifo */
+
+#define 	S_BLKSIZE  1024 /* size of a block */
+
+#define	S_ISUID		0004000	/* set user id on execution */
+#define	S_ISGID		0002000	/* set group id on execution */
+#define	S_ISVTX		0001000	/* save swapped text even after use */
+#if __BSD_VISIBLE
+#define	S_IREAD		0000400	/* read permission, owner */
+#define	S_IWRITE 	0000200	/* write permission, owner */
+#define	S_IEXEC		0000100	/* execute/search permission, owner */
+#define	S_ENFMT 	0002000	/* enforcement-mode locking */
+#endif	/* !_BSD_VISIBLE */
+
+#define	S_IFMT		_IFMT
+#define	S_IFDIR		_IFDIR
+#define	S_IFCHR		_IFCHR
+#define	S_IFBLK		_IFBLK
+#define	S_IFREG		_IFREG
+#define	S_IFLNK		_IFLNK
+#define	S_IFSOCK	_IFSOCK
+#define	S_IFIFO		_IFIFO
+
+#ifdef _WIN32
+/* The Windows header files define _S_ forms of these, so we do too
+   for easier portability.  */
+#define _S_IFMT		_IFMT
+#define _S_IFDIR	_IFDIR
+#define _S_IFCHR	_IFCHR
+#define _S_IFIFO	_IFIFO
+#define _S_IFREG	_IFREG
+#define _S_IREAD	0000400
+#define _S_IWRITE	0000200
+#define _S_IEXEC	0000100
+#endif
+
+#define	S_IRWXU 	(S_IRUSR | S_IWUSR | S_IXUSR)
+#define		S_IRUSR	0000400	/* read permission, owner */
+#define		S_IWUSR	0000200	/* write permission, owner */
+#define		S_IXUSR 0000100/* execute/search permission, owner */
+#define	S_IRWXG		(S_IRGRP | S_IWGRP | S_IXGRP)
+#define		S_IRGRP	0000040	/* read permission, group */
+#define		S_IWGRP	0000020	/* write permission, grougroup */
+#define		S_IXGRP 0000010/* execute/search permission, group */
+#define	S_IRWXO		(S_IROTH | S_IWOTH | S_IXOTH)
+#define		S_IROTH	0000004	/* read permission, other */
+#define		S_IWOTH	0000002	/* write permission, other */
+#define		S_IXOTH 0000001/* execute/search permission, other */
+
+#if __BSD_VISIBLE
+#define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO) /* 0777 */
+#define ALLPERMS (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO) /* 07777 */
+#define DEFFILEMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH) /* 0666 */
+#endif
+
+#define	S_ISBLK(m)	(((m)&_IFMT) == _IFBLK)
+#define	S_ISCHR(m)	(((m)&_IFMT) == _IFCHR)
+#define	S_ISDIR(m)	(((m)&_IFMT) == _IFDIR)
+#define	S_ISFIFO(m)	(((m)&_IFMT) == _IFIFO)
+#define	S_ISREG(m)	(((m)&_IFMT) == _IFREG)
+#define	S_ISLNK(m)	(((m)&_IFMT) == _IFLNK)
+#define	S_ISSOCK(m)	(((m)&_IFMT) == _IFSOCK)
+
+#if defined(__CYGWIN__)
+/* Special tv_nsec values for futimens(2) and utimensat(2). */
+#define UTIME_NOW	-2L
+#define UTIME_OMIT	-1L
+#endif
+
+int	chmod (const char *__path, mode_t __mode );
+int     fchmod (int __fd, mode_t __mode);
+int	fstat (int __fd, struct stat *__sbuf );
+int	mkdir (const char *_path, mode_t __mode );
+int	mkfifo (const char *__path, mode_t __mode );
+int	stat (const char *__restrict __path, struct stat *__restrict __sbuf );
+mode_t	umask (mode_t __mask );
+
+#if defined (__SPU__) || defined(__rtems__) || defined(__CYGWIN__) && !defined(__INSIDE_CYGWIN__)
+int	lstat (const char *__restrict __path, struct stat *__restrict __buf );
+int	mknod (const char *__path, mode_t __mode, dev_t __dev );
+#endif
+
+#if __ATFILE_VISIBLE && !defined(__INSIDE_CYGWIN__)
+int	fchmodat (int, const char *, mode_t, int);
+int	fstatat (int, const char *__restrict , struct stat *__restrict, int);
+int	mkdirat (int, const char *, mode_t);
+int	mkfifoat (int, const char *, mode_t);
+int	mknodat (int, const char *, mode_t, dev_t);
+int	utimensat (int, const char *, const struct timespec *, int);
+#endif
+#if __POSIX_VISIBLE >= 200809 && !defined(__INSIDE_CYGWIN__)
+int	futimens (int, const struct timespec *);
+#endif
+
+/* Provide prototypes for most of the _<systemcall> names that are
+   provided in newlib for some compilers.  */
+#ifdef _COMPILING_NEWLIB
+int	_fstat (int __fd, struct stat *__sbuf );
+int	_stat (const char *__restrict __path, struct stat *__restrict __sbuf );
+int	_mkdir (const char *_path, mode_t __mode );
+#ifdef __LARGE64_FILES
+struct stat64;
+int	_stat64 (const char *__restrict __path, struct stat64 *__restrict __sbuf );
+int	_fstat64 (int __fd, struct stat64 *__sbuf );
 #endif
 #endif
 
+#endif /* !_STAT_H_ */
 #ifdef __cplusplus
 }
 #endif
-
-#pragma pack(pop)
-
-#endif /* _INC_STAT */
-
+#endif /* _SYS_STAT_H */
